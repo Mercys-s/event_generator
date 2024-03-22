@@ -2,6 +2,8 @@ import random
 import uuid
 import os
 
+from settings import settings
+from params_metrics import random_metrics, random_params
 
 from datetime import datetime
 from faker import Faker
@@ -10,7 +12,7 @@ from faker import Faker
 fake = Faker('ru_RU')
 
 
-users = {}
+users_dict = {}
 def generator_user(count_of_users):
     for _ in range(1, count_of_users + 1):
 
@@ -24,58 +26,64 @@ def generator_user(count_of_users):
             'age': user_age,
         }
 
-        users[user_id] = user_information
+        users_dict[user_id] = user_information
 
     return f'Список из "{count_of_users}" пользователя(ей) был создан'
     
 
 event_dict = {}
-def generator_event(event_type , user_id , date_time, **kwargs):
+def generator_event(event_type , user_id , date_time, is_success):
     event_id = str(uuid.uuid4())
 
-    # Тут будут формироваться Кварги
+    parameters = random_params(event_type, settings)
+    metrics = random_metrics(event_type, settings, is_success)
+
 
     event_information = {
         'id': event_id,
-        "event_type": event_type,
+        'event_type': event_type,
         'user': user_id,
         'date_time': date_time,
-        **kwargs
+        'parameters': parameters,
+        'metrics': metrics
     }
 
     event_dict[event_id] = event_information
 
-    return 'Событие сгенерировано'
+    return f'Событие {event_id} сгенерировано'
 
 
-def user_action(user_id, **kwargs):
+def user_action(user_id):
     events = random.randint(1,4)
+    is_success = True if events > 2 else False
 
     for not_correct_event_type in range(events):
         event_type = not_correct_event_type + 1
-        date_time = datetime.now()
 
-        generator_event(event_type = event_type, user_id = user_id, date_time = date_time, **kwargs)
+        date_time_unformated = datetime.now()
+        date_time = date_time_unformated.strftime('%Y-%m-%d %H:%M:%S')
+
+        generator_event(event_type = event_type, user_id = user_id,\
+                        date_time = date_time, is_success = is_success)
 
 
 def main():
     generator_user(os.getenv('COUNT_OF_USERS', \
-                             input('Введите кол-во пользователей')))
-    for user in users:
+                             int(input('Введите кол-во пользователей: '))))
+    print(users_dict) #
+    print('-------------------')
+    
+    for user_id, user_info in users_dict.items():
+        user_action(user_id)
+    
+    print(event_dict)
+    print('-------------------')
 
-        user_action(user['id'], )
 
-# предположительно это **kwargs
-some_kwargs = {
-    'params': {
-        'Источник': 'переменная',
-        'Тип устройства': 'переменная',
-    },
-    'metrics': {
-        'Сумма заказа': 'переменная (int)',
-        'Количество страниц': 'переменная (int)',
-        'Успешно': 'переменная (bool)'
-    }
-}
 
+
+if __name__ == '__main__':
+    
+    main()
+    
 

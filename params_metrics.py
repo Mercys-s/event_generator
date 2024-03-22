@@ -10,18 +10,24 @@ def random_params(event_type, settings):
     settings_list = settings[event_type]['params']
     if settings_list != None:
         for param in settings_list:
-            params_dict['params'] = generate_value(param)
+            params_dict[param] = generate_value(param)
+
         return params_dict
+    
     else:
         return None
 
 
-def random_metrics(event_type, settings):
+def random_metrics(event_type, settings, is_success):
     metrics_dict = {}
-    # if event_type > 2: 
+
     settings_list = settings[event_type]['metrics']
     for metric in settings_list:
-        metrics_dict['metrics'] = generate_value(metric)
+        metrics_dict[metric] = generate_value(metric)
+
+        if event_type == 2:
+            metrics_dict['Успешно'] = is_success
+
     return metrics_dict
 
 
