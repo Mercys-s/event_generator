@@ -10,7 +10,6 @@ from faker import Faker
 fake = Faker('ru_RU')
 
 
-
 users = {}
 def generator_user(count_of_users):
     for _ in range(1, count_of_users + 1):
@@ -33,6 +32,8 @@ def generator_user(count_of_users):
 event_dict = {}
 def generator_event(event_type , user_id , date_time, **kwargs):
     event_id = str(uuid.uuid4())
+
+    # Тут будут формироваться Кварги
 
     event_information = {
         'id': event_id,

@@ -1,22 +1,21 @@
-success_metric = ['Успешно']
 settings = {
     1: {
-        'params': ['Источник', 'Тип браузера',],
+        'params': ['Источник', 'Тип устройства'],
         'metrics': ['Количество страниц',]
     },
 
     2: {
-        'params': ['Источник',],
-        'metrics': success_metric
+        'params': ['Источник'],
+        'metrics': ['Успешно']
     },
 
     3: {
         'params': None,
-        'metrics': ['Сумма заказа'] + success_metric
+        'metrics': ['Сумма заказа']
     },
 
     4: {
         'params': None,
-        'metrics': ['Сумма заказа'] + success_metric
+        'metrics': ['Сумма заказа']
     }
 }

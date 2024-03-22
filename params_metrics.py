@@ -4,14 +4,25 @@
 import random
 
 
-def random_params(settings):
-    params = {}
+def random_params(event_type, settings):
+    params_dict = {}
     
+    settings_list = settings[event_type]['params']
+    if settings_list != None:
+        for param in settings_list:
+            params_dict['params'] = generate_value(param)
+        return params_dict
+    else:
+        return None
 
 
-
-def random_metrics():
-    pass
+def random_metrics(event_type, settings):
+    metrics_dict = {}
+    # if event_type > 2: 
+    settings_list = settings[event_type]['metrics']
+    for metric in settings_list:
+        metrics_dict['metrics'] = generate_value(metric)
+    return metrics_dict
 
 
 def generate_value(value_name):
