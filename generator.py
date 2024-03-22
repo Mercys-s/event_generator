@@ -1,6 +1,7 @@
 import random
 import uuid
 import os
+import csv
 
 from settings import settings
 from params_metrics import random_metrics, random_params
@@ -67,23 +68,57 @@ def user_action(user_id):
                         date_time = date_time, is_success = is_success)
 
 
-def main():
-    generator_user(os.getenv('COUNT_OF_USERS', \
-                             int(input('Введите кол-во пользователей: '))))
-    print(users_dict) #
-    print('-------------------')
+# Запись в csv файл
+def write_csv():
     
+    with open('journal.csv', 'w', encoding='utf-8', newline='') as file:
+        writer = csv.writer(file, delimiter=';')
+        writer.writerow(
+            ('Идентификатор События', 'Тип События', 'Идентификатор Пользователя', 'Дата/Время', 'Источник ', \
+             'Тип Устройства', 'Успешный ли звонок', 'Кол-во Просмотренных Страниц', 'Сумма заказа')
+        )
+
+        for event_id, event_info in event_dict.items():
+            
+            writer.writerow(
+                [
+                event_info['id'],
+                event_info['event_type'],
+                event_info['user'],
+                event_info['date_time'],
+
+                event_info.get('parameters', {}).get('Источник', '') \
+                if event_info.get('parameters') else '', 
+
+                event_info.get('parameters', {}).get('Тип устройства', '') \
+                if event_info.get('parameters') else '',  
+
+                event_info.get('metrics', {}).get('Успешно', '') \
+                if event_info.get('metrics') else '',  
+
+                event_info.get('metrics', {}).get('Количество страниц', '') \
+                if event_info.get('metrics') else '',  
+
+                event_info.get('metrics', {}).get('Сумма заказа', '') \
+                if event_info.get('metrics') else ''
+                ]
+            )
+
+
+def main():
+    
+    # Генерация пользователей
+    generator_user(int(input('Введите кол-во пользователей: ')))
+
+    # Сам процесс, имитация действий пользователей
     for user_id, user_info in users_dict.items():
         user_action(user_id)
     
-    print(event_dict)
-    print('-------------------')
-
-
+    # Запись результатов в CSV файл
+    write_csv()
 
 
 if __name__ == '__main__':
-    
     main()
     
 
