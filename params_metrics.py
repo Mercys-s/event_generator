@@ -3,7 +3,7 @@
 
 import random
 
-
+# Генеририрует параметры
 def random_params(event_type, settings):
     params_dict = {}
     
@@ -17,7 +17,7 @@ def random_params(event_type, settings):
     else:
         return None
 
-
+# Генеририрует метрики
 def random_metrics(event_type, settings, is_success):
     metrics_dict = {}
 
@@ -25,12 +25,15 @@ def random_metrics(event_type, settings, is_success):
     for metric in settings_list:
         metrics_dict[metric] = generate_value(metric)
 
+        # Нужно для выполнения условия, если произошла покупка/была отменена - звонок был успешен
+        # Если событий всего 2 (Заход на сайт и звонок, то звонок был не успешный)
         if event_type == 2:
             metrics_dict['Успешно'] = is_success
 
     return metrics_dict
 
 
+# Функция генерирующая непосредственно значения
 def generate_value(value_name):
     if value_name == 'Источник':
         return random.choice(['Яндекс', 'Гугл', 'Опера', 'Фейсбук', 'Инстаграмм'])

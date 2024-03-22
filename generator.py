@@ -39,7 +39,6 @@ def generator_event(event_type , user_id , date_time, is_success):
     parameters = random_params(event_type, settings)
     metrics = random_metrics(event_type, settings, is_success)
 
-
     event_information = {
         'id': event_id,
         'event_type': event_type,
