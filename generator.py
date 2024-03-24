@@ -1,20 +1,37 @@
+'''
+Файл содержит в себе:  
+1. Генератор пользователей,
+2. Генератор событий,
+3. Иммитацию действия пользователя
+
+Случайные данные реализуются с помощью: 
+1. Библиотеки faker (имена пользователей)
+2. Библиотеки uuid (ID-шники пользователей, событий)
+3. Библиотеки datetime
+'''
+
 import random
 import uuid
-import os
-import csv
 
 from settings import settings
 from params_metrics import random_metrics, random_params
+from csv_writer import write_csv
 
 from datetime import datetime
 from faker import Faker
 
-# Определяется язык, для библеотеки, придумывающей информацию
 fake = Faker('ru_RU')
 
 
-users_dict = {}
+users_data = {}
 def generator_user(count_of_users):
+    '''
+    Генерирует пользователей и собирает их в словарь
+    users_data
+
+    Аргументом принимает кол-во генерируемых юзеров
+
+    '''
     for _ in range(1, count_of_users + 1):
 
         user_id = str(uuid.uuid4())
@@ -27,13 +44,24 @@ def generator_user(count_of_users):
             'age': user_age,
         }
 
-        users_dict[user_id] = user_information
+        users_data[user_id] = user_information
 
     return f'Список из "{count_of_users}" пользователя(ей) был создан'
     
 
-event_dict = {}
+event_data = {}
 def generator_event(event_type , user_id , date_time, is_success):
+    '''
+    Генерирует события и собирает их в словарь
+    event_data для последущей записи в csv-файл
+
+    Аргументом принимает:
+    1. Тип события (int)   3. Дату события (str)
+    2. ID юзеров (str)     4. Был ли успешен звонок (bool)
+
+    Внутри генератора событий используются функции для
+    создания параметров и метрик
+    '''
     event_id = str(uuid.uuid4())
 
     parameters = random_params(event_type, settings)
@@ -48,12 +76,22 @@ def generator_event(event_type , user_id , date_time, is_success):
         'metrics': metrics
     }
 
-    event_dict[event_id] = event_information
+    event_data[event_id] = event_information
 
     return f'Событие {event_id} сгенерировано'
 
 
 def user_action(user_id):
+    '''
+    В этой функции имитируется действие пользователя:
+    1. Определяется сколько событий будет у юзера (1-4)
+    2. Определяется успешность звонка
+    3. Создается дата/время события
+
+    Аргументом принимает:
+    1. ID юзеров (str), которые приходят из users_data
+
+    '''
     events = random.randint(1,4)
     is_success = True if events > 2 else False
 
@@ -67,54 +105,26 @@ def user_action(user_id):
                         date_time = date_time, is_success = is_success)
 
 
-# Запись в csv файл
-def write_csv():
-    
-    with open('journal.csv', 'w', encoding='utf-8', newline='') as file:
-        writer = csv.writer(file, delimiter=';')
-        writer.writerow(
-            ('Идентификатор События', 'Тип События', 'Идентификатор Пользователя', 'Дата/Время', 'Источник ', \
-             'Тип Устройства', 'Успешный ли звонок', 'Кол-во Просмотренных Страниц', 'Сумма заказа')
-        )
-
-        for event_id, event_info in event_dict.items():
-            
-            writer.writerow(
-                [
-                event_info['id'],
-                event_info['event_type'],
-                event_info['user'],
-                event_info['date_time'],
-
-                event_info.get('parameters', {}).get('Источник', '') \
-                if event_info.get('parameters') else '', 
-
-                event_info.get('parameters', {}).get('Тип устройства', '') \
-                if event_info.get('parameters') else '',  
-
-                event_info.get('metrics', {}).get('Успешно', '') \
-                if event_info.get('metrics') else '',  
-
-                event_info.get('metrics', {}).get('Количество страниц', '') \
-                if event_info.get('metrics') else '',  
-
-                event_info.get('metrics', {}).get('Сумма заказа', '') \
-                if event_info.get('metrics') else ''
-                ]
-            )
-
-
 def main():
-    
-    # Генерация пользователей
-    generator_user(int(input('Введите кол-во пользователей: ')))
+    '''
+    Главная функция:
+    1. Проверяет корректность входных данных
+    2. Запускает генератор пользователей
+    3. Определяет, какой пользователь, какие события вызвал
+    4. Созданные события запсываются в итоговый CSV-файл
 
-    # Сам процесс, имитация действий пользователей
-    for user_id, user_info in users_dict.items():
+    '''
+    try:
+        count_of_users = int(input('Введите кол-во пользователей: '))
+    except:
+        raise ValueError('Используйте числовое значение')
+
+    generator_user(count_of_users)
+
+    for user_id, user_info in users_data.items():
         user_action(user_id)
     
-    # Запись результатов в CSV файл
-    write_csv()
+    write_csv(event_data)
 
 
 if __name__ == '__main__':
