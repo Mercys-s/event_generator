@@ -15,6 +15,6 @@
 Чтобы использовать проект, нужно:
 
 1. Установить зависимости
-   pip install requirements.txt
+   pip install -r requirements.txt
 2. Запустить файл generator.py
    python generator.py
